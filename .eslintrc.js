@@ -26,7 +26,12 @@ module.exports = {
             extensions: ['.js', '.jsx'],
           }
         }
-      }
+    },
+    rules: {
+        "quotes": [1, "double", {
+            "avoidEscape": false,
+            "allowTemplateLiterals": true,
+          }]
     }
   },
   plugins: [
