@@ -237,7 +237,7 @@
     "react-router-redux": "~5.0.0-alpha.6",
     "react-select": "~1.2.1",
     "react-sortablejs": "~1.5.1",
-    "react-table": "^7.8.0",
+    "react-table": "6.8.6",
     "react-tiny-virtual-list": "~2.2.0",
     "react-toggle": "~4.0.2",
     "recompose": "~0.30.0",
