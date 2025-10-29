@@ -68,7 +68,7 @@ class AutoLevelWidget extends PureComponent {
       content += row.join(',') + '\n';
     });
     return content;
-  }
+  };
 
   download = (content, fileName, contentType) => {
     let a = document.createElement('a');
@@ -76,7 +76,7 @@ class AutoLevelWidget extends PureComponent {
     a.href = URL.createObjectURL(file);
     a.download = fileName;
     a.click();
-  }
+  };
 
   actions = {
     toggleFullscreen: () => {
@@ -321,7 +321,7 @@ class AutoLevelWidget extends PureComponent {
     }
     //log.info('AutoLevel/index.jsx makeProbeFileCommands:' + JSON.stringify(this.probingGcode));
     //log.info('AutoLevel/index.jsx makeProbeFileCommands:' + this.probingGcode.join(''));
-  }
+  };
 
   controllerEvents = {
     // atmelino

@@ -49,9 +49,9 @@ class ApplyAutoLevel extends PureComponent {
     },
     canClickSave: false,
     canClickUpload: false
-  }
+  };
 
-  alFileNamePrefix = '#AL:'
+  alFileNamePrefix = '#AL:';
 
   probedPoints = [];
 
@@ -189,7 +189,7 @@ class ApplyAutoLevel extends PureComponent {
     //log.info( 'ApplyAutoLevel readProbingFile probedPoints[3].z \n' + this.probedPoints[3].z);
     this.updateBbox();
     this.canClick();
-  }
+  };
 
   readGcodeFile = (contents) => {
     //log.info('ApplyAutoLevel gcodeFile  \n' + contents);
@@ -197,7 +197,7 @@ class ApplyAutoLevel extends PureComponent {
     // log.info('ApplyAutoLevel readGcodeFile this.gcode  \n' + this.gcode);
     this.findMinMax();
     this.canClick();
-  }
+  };
 
   findMinMax = () => {
     let lines = this.gcode.split('\n');
@@ -249,7 +249,7 @@ class ApplyAutoLevel extends PureComponent {
         }
       }
     });
-  }
+  };
 
   autolevelSave = (contents) => {
     log.info('ApplyAutoLevel autolevelSave \n');
@@ -261,14 +261,14 @@ class ApplyAutoLevel extends PureComponent {
     let fileName = newgcodeFileName;
     let fileContent = this.result.join('\n');
     this.download(fileContent, fileName, 'text/plain');
-  }
+  };
 
   autolevelUpload = (contents) => {
     // const { state, actions } = this.props;
     const { actions } = this.props;
     this.applyCompensation();
     actions.loadAutoLevelledGcode(this.result);
-  }
+  };
 
   applyCompensation() {
     log.info('ApplyAutoLevel applyCompensation AL: applying compensation ...\n');
@@ -353,7 +353,7 @@ class ApplyAutoLevel extends PureComponent {
     a.href = URL.createObjectURL(file);
     a.download = fileName;
     a.click();
-  }
+  };
 
   stripComments(line) {
     const re1 = new RegExp(/\s*\([^\)]*\)/g); // Remove anything inside the parentheses

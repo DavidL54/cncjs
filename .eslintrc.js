@@ -24,16 +24,6 @@ module.exports = {
           },
         },
       },
-      rules: {
-        quotes: [
-          1,
-          "double",
-          {
-            avoidEscape: false,
-            allowTemplateLiterals: true,
-          },
-        ],
-      },
     },
   },
   plugins: ["@babel", "jest"],
