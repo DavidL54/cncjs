@@ -14,6 +14,7 @@ import SmoothieWidget from 'app/widgets/Smoothie';
 import SpindleWidget from 'app/widgets/Spindle';
 import CustomWidget from 'app/widgets/Custom';
 import TinyGWidget from 'app/widgets/TinyG';
+import ToolWidget from 'app/widgets/Tool';
 import VisualizerWidget from 'app/widgets/Visualizer';
 import WebcamWidget from 'app/widgets/Webcam';
 
@@ -33,6 +34,7 @@ const getWidgetByName = (name) => {
     'spindle': SpindleWidget,
     'custom': CustomWidget,
     'tinyg': TinyGWidget,
+    'tool': ToolWidget,
     'visualizer': VisualizerWidget,
     'webcam': WebcamWidget
   }[name] || null;

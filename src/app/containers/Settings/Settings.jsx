@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import ensureArray from 'ensure-array';
+import { ensureArray } from 'ensure-type';
 import i18next from 'i18next';
 import Uri from 'jsuri';
 import _camelCase from 'lodash/camelCase';
@@ -110,7 +110,9 @@ class Settings extends PureComponent {
 
           api.getState()
             .then((res) => {
-              const { checkForUpdates } = { ...res.body };
+              const {
+                allowAnonymousUsageDataCollection,
+              } = { ...res.body };
 
               const nextState = {
                 ...this.state.general,
@@ -120,8 +122,8 @@ class Settings extends PureComponent {
                   loading: false
                 },
                 // followed by data
-                checkForUpdates: !!checkForUpdates,
-                lang: i18next.language
+                allowAnonymousUsageDataCollection: !!allowAnonymousUsageDataCollection,
+                lang: i18next.language // TODO: Store language settings into the state
               };
 
               this.initialState.general = nextState;
@@ -142,7 +144,10 @@ class Settings extends PureComponent {
             });
         },
         save: () => {
-          const { lang = 'en' } = this.state.general;
+          const {
+            allowAnonymousUsageDataCollection,
+            lang = 'en',
+          } = this.state.general;
 
           this.setState({
             general: {
@@ -156,7 +161,7 @@ class Settings extends PureComponent {
           });
 
           const data = {
-            checkForUpdates: this.state.general.checkForUpdates
+            allowAnonymousUsageDataCollection,
           };
 
           api.setState(data)
@@ -205,12 +210,12 @@ class Settings extends PureComponent {
             general: this.initialState.general
           });
         },
-        toggleCheckForUpdates: () => {
-          const { checkForUpdates } = this.state.general;
+        toggleAllowAnonymousUsageDataCollection: () => {
+          const { allowAnonymousUsageDataCollection } = this.state.general;
           this.setState({
             general: {
               ...this.state.general,
-              checkForUpdates: !checkForUpdates
+              allowAnonymousUsageDataCollection: !allowAnonymousUsageDataCollection,
             }
           });
         },
@@ -273,7 +278,7 @@ class Settings extends PureComponent {
                 loading: false
               },
               // followed by data
-              ignoreErrors: !!ignoreErrors
+              ignoreErrors: !!ignoreErrors,
             };
 
             this.initialState.controller = nextState;
@@ -307,8 +312,8 @@ class Settings extends PureComponent {
           const data = {
             controller: {
               exception: {
-                ignoreErrors: this.state.controller.ignoreErrors
-              }
+                ignoreErrors: this.state.controller.ignoreErrors,
+              },
             }
           };
 
@@ -352,7 +357,7 @@ class Settings extends PureComponent {
               ignoreErrors: !state.controller.ignoreErrors
             }
           }));
-        }
+        },
       },
       // Machine Profiles
       machineProfiles: {
@@ -1089,7 +1094,7 @@ class Settings extends PureComponent {
             loading: true, // defaults to true
             saving: false
           },
-          checkForUpdates: true,
+          allowAnonymousUsageDataCollection: false,
           lang: i18next.language
         },
         // Workspace
@@ -1145,7 +1150,7 @@ class Settings extends PureComponent {
             loading: true, // defaults to true
             saving: false
           },
-          ignoreErrors: false
+          ignoreErrors: false,
         },
         // Commands
         commands: {

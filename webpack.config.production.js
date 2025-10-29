@@ -2,25 +2,18 @@ const crypto = require('crypto');
 const path = require('path');
 const boolean = require('boolean');
 const dotenv = require('dotenv');
-const findImports = require('find-imports');
+const ESLintPlugin = require('eslint-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const without = require('lodash/without');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const CSSMinimizerWebpackPlugin = require('css-minimizer-webpack-plugin');
-const TerserPlugin = require('terser-webpack-plugin');
 const webpack = require('webpack');
-const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const babelConfig = require('./babel.config');
 const buildConfig = require('./build.config');
 const pkg = require('./src/package.json');
 
 dotenv.config({
-  path: path.resolve('webpack.config.app.production.env')
+  path: path.resolve('webpack.config.production.env'),
 });
-
-const USE_ESLINT_LOADER = boolean(process.env.USE_ESLINT_LOADER);
-const USE_TERSER_PLUGIN = boolean(process.env.USE_TERSER_PLUGIN);
-const USE_OPTIMIZE_CSS_ASSETS_PLUGIN = boolean(process.env.USE_OPTIMIZE_CSS_ASSETS_PLUGIN);
 
 // Use publicPath for production
 const publicPath = ((payload) => {
@@ -30,7 +23,6 @@ const publicPath = ((payload) => {
   return '/' + hash.substring(0, 8) + '/'; // 8 digits
 })(pkg.version);
 const buildVersion = pkg.version;
-const timestamp = new Date().getTime();
 
 module.exports = {
   mode: 'production',
@@ -39,36 +31,23 @@ module.exports = {
   context: path.resolve(__dirname, 'src/app'),
   devtool: 'cheap-module-source-map',
   entry: {
-    polyfill: [
-      path.resolve(__dirname, 'src/app/polyfill/index.js')
-    ],
-    vendor: findImports([
-      'src/app/**/*.{js,jsx}',
-      '!src/app/polyfill/**/*.js',
-      '!src/app/**/*.development.js'
-    ], { flatten: true }),
-    app: [
+    main: [
       path.resolve(__dirname, 'src/app/index.jsx')
-    ]
+    ],
   },
   output: {
     path: path.resolve(__dirname, 'dist/cncjs/app'),
-    chunkFilename: `[name].[chunkhash].bundle.js?_=${timestamp}`,
-    filename: `[name].[chunkhash].bundle.js?_=${timestamp}`,
+    filename: '[name].[contenthash].bundle.js',
     publicPath: publicPath
   },
   module: {
     rules: [
-      USE_ESLINT_LOADER && {
-        test: /\.jsx?$/,
-        loader: 'eslint-loader',
-        enforce: 'pre',
-        exclude: /node_modules/
-      },
       {
         test: /\.jsx?$/,
         loader: 'babel-loader',
-        options: babelConfig,
+        options: {
+          ...babelConfig(),
+        },
         exclude: /node_modules/
       },
       {
@@ -90,13 +69,13 @@ module.exports = {
             options: {
               stylusOptions: {
                 use: ['nib'],
-                import: ['nib']
+                import: ['nib'],
               }
             }
           }
         ],
         exclude: [
-          path.resolve(__dirname, 'src/app/styles')
+          path.resolve(__dirname, 'src/app/styles'),
         ]
       },
       {
@@ -106,20 +85,21 @@ module.exports = {
           {
             loader: 'css-loader',
             options: {
-              modules: false
+              localsConvention: 'camelCase',
+              modules: false,
             }
           },
-          'stylus-loader'
+          'stylus-loader',
         ],
         include: [
-          path.resolve(__dirname, 'src/app/styles')
+          path.resolve(__dirname, 'src/app/styles'),
         ]
       },
       {
         test: /\.css$/,
         use: [
           'style-loader',
-          'css-loader'
+          'css-loader',
         ]
       },
       {
@@ -149,14 +129,7 @@ module.exports = {
     ].filter(Boolean)
   },
   optimization: {
-    minimizer: [
-      USE_TERSER_PLUGIN && (
-        new TerserPlugin()
-      ),
-      USE_OPTIMIZE_CSS_ASSETS_PLUGIN && (
-        new CSSMinimizerWebpackPlugin()
-      ),
-    ].filter(Boolean)
+    minimize: true,
   },
   plugins: [
     new webpack.DefinePlugin({
@@ -164,20 +137,22 @@ module.exports = {
         NODE_ENV: JSON.stringify('production'),
         BUILD_VERSION: JSON.stringify(buildVersion),
         LANGUAGES: JSON.stringify(buildConfig.languages),
-        TRACKING_ID: JSON.stringify(buildConfig.analytics.trackingId)
+        TRACKING_ID: JSON.stringify(buildConfig.analytics.trackingId),
       }
     }),
     new webpack.ContextReplacementPlugin(
       /moment[\/\\]locale$/,
       new RegExp('^\./(' + without(buildConfig.languages, 'en').join('|') + ')$')
     ),
-    // Generates a manifest.json file in your root output directory with a mapping of all source file names to their corresponding output file.
-    new WebpackManifestPlugin({
-      fileName: 'manifest.json'
+    new ESLintPlugin({
+      extensions: ['js', 'jsx'],
+      exclude: [
+        '/node_modules/',
+      ],
     }),
     new MiniCssExtractPlugin({
-      filename: `[name].css?_=${timestamp}`,
-      chunkFilename: `[id].css?_=${timestamp}`
+      filename: '[name].css',
+      chunkFilename: '[id].css',
     }),
     new HtmlWebpackPlugin({
       filename: 'index.hbs',
@@ -185,18 +160,22 @@ module.exports = {
     })
   ],
   resolve: {
+    alias: {
+      '@app': path.resolve(__dirname, 'src/app'),
+    },
+    extensions: ['.js', '.jsx'],
+    fallback: {
+      crypto: require.resolve('crypto-browserify'),
+      fs: false,
+      net: false,
+      path: require.resolve('path-browserify'),
+      stream: require.resolve('stream-browserify'),
+      timers: require.resolve('timers-browserify'),
+      tls: false,
+    },
     modules: [
       path.resolve(__dirname, 'src'),
       'node_modules'
     ],
-    fallback: {
-      fs: false,
-      net: false,
-      path: false,
-      stream: require.resolve('stream-browserify'),
-      timers: false,
-      tls: false,
-    },
-    extensions: ['.js', '.jsx']
-  }
+  },
 };
